@@ -1,0 +1,127 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <title>内蒙古高考网报辅助查询</title>
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script src="js/cheat-order.js"></script>
+
+</head>
+
+<body>
+<h1 align="center">内蒙古高考网报辅助查询</h1>
+<h4>使用说明</h4>
+1、开发初衷是帮学弟学妹们查报考情况的时候太不友好了，比如不知道哪个学校有想要的专业，不能直接筛选出自己想去的城市的学校等等<br>
+   而且大部分的查询软件针对内蒙古的数据不准，而且报考机构的收费确实吓人，自己查查也能解决问题
+2、数据来源为2018年网报数据库以及阳光高考的公示信息，精力有限，暂时只有普通文理，蒙授文理，少数民族预科以及每个批次的第一次填报数据<br>
+3、特色功能：通过专业来查学校，通过省份和城市来查学校，支持跨批次查询<br>
+<font color="red">4、查询性能：因为数据库数目较大，且筛选条件复杂，并且为了方便查看和导出excel没有做分页，查询时间1秒至2分钟不等，建议大家一定要输入分数和批次来加快查询速度，如果没反应请耐心等待不要重复点击搜索</font><br>
+5、注意事项：建议使用电脑访问，时间不足，没有考虑查询健壮性，一定要按要求输入，比如按中文逗号隔开省份，城市，专业<br>
+6、报错信息：弹窗提示查询失败为系统问题，请联系开发者。不显示数据为当前筛选条件下没有适合的学校<br>
+7、联系方式：使用问题，意见反馈等请联系QQ:375816916<br>
+8、不要嫌页面丑。。。嫌丑的前端同学来救救我。<br>
+<font color="red">9、服务器没有做优化，建议不要外传，不然用的人多了就崩溃，或者被报考机构恶意破化</font> <br>
+10、报考建议大家多多自己查，祝大家能被理想的学校录取<br>
+<h4>功能介绍</h4>
+1、分数筛选取的是2018年该专业1:1投档最低分，所以可能只显示该学校的部分专业<br>
+2、跨批次查询为那些处于一二本交界，二本专科交界的同学提供一次性查看比对<br>
+3、目标省份和城市如果同时填写，则并集查询，比如省份输入内蒙古，城市输入哈尔滨，则同时查询内蒙古和哈尔滨的数据<br>
+4、学校查询不多说，专业查询就是比如我想学计算机，但是又不知道什么学校有计算机，之前要挨个看，现在可以直接筛选出来有这个专业的学校<br>
+5、按学校分组就是是不是把同一个学校的所有符合条件的专业放在一起显示<br>
+<font color="red">6、搜索完成后支持导出excel的功能</font><font color="#00bfff">（仅电脑可用，微信不可）</font>，<font color="red">导出后建议用wps打开，导出有问题可以联系QQ:375816916</font><br>
+<p><a href="https://www.nm.zsks.cn/18gkwb/" target="_blank">2018网报结果链接</a></p>
+<font color="red">请使用合理的筛选条件，没有结果可以适当减少筛选条件或者确认是否输入有误</font><br>
+<form>
+
+    <table id="table-search" width="80%" align="center" border="1">
+        <tr>
+            <td><font color="red">分数范围上限（必填）</font></td>
+            <td><input name="maxScore" type="text" id="maxScore">建议2019年分数+30分作为上限</td>
+        </tr>
+        <tr>
+            <td><font color="red">分数范围下限（必填）</font></td>
+            <td><input name="minScore" type="text" id="minScore">建议2019年分数-40分作为下限</td>
+        </tr>
+        <tr>
+            <td>科目</td>
+            <td><select name="subject" id="subject">
+                <option value="普通理科">普通理科</option>
+                <option value="普通文科">普通文科</option>
+                <option value="蒙授理科">蒙授理科</option>
+                <option value="蒙授文科">蒙授文科</option>
+            </select>必选</td>
+        </tr>
+        <tr>
+            <td>是否报考少数民族预科</td>
+            <td><input name="minority" type="radio" value="false" checked>否  <input name="minority" type="radio" value="true">是
+                <br>默认为否，尽量不要输入专业筛选，省份和城市筛选继续支持，少数民族预科请选择普通文科或者普通理科
+        </tr>
+        <tr>
+            <td>批次（非必填）</td>
+            <td><input type="checkbox" name="batchBox" value="提前">提前批
+                <input type="checkbox" name="batchBox" value="本科一批">本科一批
+                <input type="checkbox" name="batchBox" value="本科二批">本科二批
+                <input type="checkbox" name="batchBox" value="高职高专">高职高专<br>可多选，不选则显示所有批次</td>
+        </tr>
+        <tr>
+            <td>目标省份(非必填)</td>
+            <td><input name="province" type="text" id="province">输入省份简称，以（中文逗号）隔开
+                例如：<br>北京，内蒙古，黑龙江，浙江</td>
+        </tr>
+        <tr>
+            <td>目标城市(非必填)</td>
+            <td><input name="city" type="text" id="city">输入城市简称，以（中文逗号）隔开
+                例如：<br>哈尔滨，杭州，天津，成都</td>
+        </tr>
+        <tr>
+            <td>目标学校(非必填)</td>
+            <td><input name="schools" type="text" id="schools">建议输入阳光高考网公布的学校全称或前后自行省略，务必不要输入简称
+                <br>以（中文逗号）隔开 例如：
+                <br>哈尔滨工业大学，哈尔滨工业，工业大学（一定不要输入哈工大）</td>
+        </tr>
+        <tr>
+            <td>目标专业(非必填)</td>
+            <td><input name="majors" type="text" id="majors">最好不要输入精确的专业，以便防止筛选数据不全，如计算机科学与技术或者软件工程，建议输入计算机,软件
+                <br>以（中文逗号）隔开 例如：
+                <br>计算机，软件，工程，管理，法，医</td>
+        </tr>
+        <tr>
+            <td>是否按学校分组</td>
+            <td><input name="group" type="radio" value="false" checked>否  <input name="group" type="radio" value="true">是
+                <br>默认为否，则按照成绩从高到低排序，如选择是，则先按学校名称排序，再按学校专业分数高低排序
+        </tr>
+        <tr>
+            <td><a id = "export">导出表格</a></td>
+            <td>
+                <input type="button" value="搜索" id="btSearch" class="ui right floated positive button btn-search"/>
+            </td>
+        </tr>
+    </table>
+
+</form>
+
+<br/>
+<p id="totalText">输入条件后，点击搜索，务必输入分数和批次减少筛选范围</p>
+
+<table id="table-result" width="80%" align="center" border="1">
+    <tr>
+        <th>科目</th>
+        <th>批次</th>
+        <th>学校编号</th>
+        <th>学校名称</th>
+        <th>专业编号</th>
+        <th>专业名称</th>
+        <th>计划数</th>
+        <th>最低录取分</th>
+        <th>学费</th>
+        <th>校区</th>
+        <th>所属</th>
+        <th>省份</th>
+        <th>城市</th>
+    </tr>
+    <tbody id="tbody-result">
+    </tbody>
+</table>
+
+</body>
+
+</html>

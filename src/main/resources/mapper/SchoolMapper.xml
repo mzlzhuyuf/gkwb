@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyf.springboot06datamybatis.dao.SchoolDao">
+  <resultMap id="BaseResultMap" type="com.zyf.springboot06datamybatis.bean.School">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="batch" jdbcType="VARCHAR" property="batch" />
+    <result column="subject" jdbcType="VARCHAR" property="subject" />
+    <result column="schoolID" jdbcType="VARCHAR" property="schoolid" />
+    <result column="schoolName" jdbcType="VARCHAR" property="schoolname" />
+    <result column="schoolHref" jdbcType="VARCHAR" property="schoolhref" />
+    <result column="amount" jdbcType="INTEGER" property="amount" />
+    <result column="oneToOne" jdbcType="INTEGER" property="onetoone" />
+    <result column="proportion" jdbcType="VARCHAR" property="proportion" />
+    <result column="predictScore" jdbcType="INTEGER" property="predictscore" />
+    <result column="shouldAmount" jdbcType="INTEGER" property="shouldamount" />
+    <result column="alreadyAmount" jdbcType="INTEGER" property="alreadyamount" />
+    <result column="lackAmount" jdbcType="INTEGER" property="lackamount" />
+    <result column="regulations" jdbcType="VARCHAR" property="regulations" />
+    <result column="year" jdbcType="VARCHAR" property="year" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, subject, batch, schoolID, schoolName, schoolHref, amount, oneToOne, proportion, predictScore,
+    shouldAmount, alreadyAmount, lackAmount, regulations, year
+  </sql>
+  
+  <select id="queryAll" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List"></include>
+    from school
+  </select>
+
+  <insert id="addSchool" parameterType="com.zyf.springboot06datamybatis.bean.School">
+    insert into school
+    (subject, batch, schoolID, schoolName, schoolHref, amount, oneToOne, proportion, predictScore, shouldAmount, alreadyAmount, lackAmount, regulations, year)
+    values (#{subject}, #{batch}, #{schoolid}, #{schoolname}, #{schoolhref}, #{amount}, #{onetoone}, #{proportion}, #{predictscore}, #{shouldamount}, #{alreadyamount}, #{lackamount}, #{regulations}, #{year})
+  </insert>
+</mapper>

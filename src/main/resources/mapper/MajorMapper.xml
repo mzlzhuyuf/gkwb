@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyf.springboot06datamybatis.dao.MajorDao">
+  <resultMap id="BaseResultMap" type="com.zyf.springboot06datamybatis.bean.Major">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="subject" jdbcType="VARCHAR" property="subject" />
+    <result column="batch" jdbcType="VARCHAR" property="batch" />
+    <result column="school_ID" jdbcType="VARCHAR" property="schoolId" />
+    <result column="school_name" jdbcType="VARCHAR" property="schoolName" />
+    <result column="major_id" jdbcType="VARCHAR" property="majorId" />
+    <result column="major_name" jdbcType="VARCHAR" property="majorName" />
+    <result column="amount" jdbcType="INTEGER" property="amount" />
+    <result column="one_one_score" jdbcType="INTEGER" property="oneOneScore" />
+    <result column="already_amount" jdbcType="INTEGER" property="alreadyAmount" />
+    <result column="tuition_fee" jdbcType="VARCHAR" property="tuitionFee" />
+    <result column="location" jdbcType="VARCHAR" property="location" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="year" jdbcType="VARCHAR" property="year" />
+  </resultMap>
+
+    <resultMap id="innerMap" type="com.zyf.springboot06datamybatis.bean.dto.MajorLocationDTO">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="subject" jdbcType="VARCHAR" property="subject" />
+        <result column="batch" jdbcType="VARCHAR" property="batch" />
+        <result column="school_ID" jdbcType="VARCHAR" property="schoolId" />
+        <result column="school_name" jdbcType="VARCHAR" property="schoolName" />
+        <result column="major_id" jdbcType="VARCHAR" property="majorId" />
+        <result column="major_name" jdbcType="VARCHAR" property="majorName" />
+        <result column="amount" jdbcType="INTEGER" property="amount" />
+        <result column="one_one_score" jdbcType="INTEGER" property="oneOneScore" />
+        <result column="already_amount" jdbcType="INTEGER" property="alreadyAmount" />
+        <result column="tuition_fee" jdbcType="VARCHAR" property="tuitionFee" />
+        <result column="location" jdbcType="VARCHAR" property="location" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="year" jdbcType="VARCHAR" property="year" />
+        <association property="schoolLocation" javaType="com.zyf.springboot06datamybatis.bean.SchoolLocation">
+            <result column="department" jdbcType="VARCHAR" property="department" />
+            <result column="province" jdbcType="VARCHAR" property="province" />
+            <result column="city" jdbcType="VARCHAR" property="city" />
+        </association>
+    </resultMap>
+  <sql id="Base_Column_List">
+    id, subject, batch, school_ID, school_name, major_id, major_name, amount, one_one_score, 
+    already_amount, tuition_fee, location, remark, year
+  </sql>
+    <sql id="innerList">
+    m.id, m.subject, m.batch, m.school_ID, m.school_name, m.major_id, m.major_name, m.amount, m.one_one_score,
+    m.already_amount, m.tuition_fee, m.location, m.remark, m.year, l.department, l.province, l.city
+    </sql>
+  <select id="selectByCondition" resultMap="innerMap">
+      select
+      <include refid="innerList" />
+      from major m left join school_location l
+      on m.school_name = l.school_name
+      <where>
+          <if test="batchList != null and batchList.size() > 0">
+              and
+              <foreach collection="batchList" item="batch" open="(" separator=" or " close=")">
+                  m.batch like concat('%','${batch}','%')
+              </foreach>
+          </if>
+          and m.subject = #{subject}
+          <if test="schoolNameList != null and schoolNameList.size() > 0">
+              and
+              <foreach collection="schoolNameList" item="school_name" open="(" separator=" or " close=")">
+                  m.school_name like concat('%','${school_name}','%')
+              </foreach>
+          </if>
+          <if test="majorList != null and majorList.size() > 0">
+              and
+              <foreach collection="majorList" item="major_name" open="(" separator=" or " close=")">
+                  m.major_name like concat('%','${major_name}','%')
+              </foreach>
+          </if>
+          <if test="(provinceList != null and provinceList.size() > 0) or (cityList != null and cityList.size() > 0)">
+              and (
+              <if test="provinceList != null and provinceList.size() > 0">
+                  <foreach collection="provinceList" item="province" open="(" separator=" or " close=")">
+                      l.province like concat('%','${province}','%')
+                  </foreach>
+              </if>
+              <if test="cityList != null and cityList.size() > 0">
+                  or
+                  <foreach collection="cityList" item="city" open="(" separator=" or " close=")">
+                      l.city like concat('%','${city}','%')
+                  </foreach>
+              </if>
+              )
+          </if>
+          <if test="minScore != null">
+              and m.one_one_score &gt;= #{minScore}
+          </if>
+          <if test="maxScore != null">
+              and m.one_one_score &lt;= #{maxScore}
+          </if>
+          <if test="year != null and year.length() > 0">
+              and m.year = #{year}
+          </if>
+          <if test="fee != null and fee.length() > 0">
+              and m.tuition_fee &lt;= #{fee}
+          </if>
+      </where>
+      order by one_one_score desc,FIELD(m.batch,'本科提前A','专科提前','本科一批','本科二批','高职高专');
+  </select>
+    <select id="selectByConditionGroupBySchool" resultMap="innerMap">
+        select
+        <include refid="innerList" />
+        from major m left join school_location l
+        on m.school_name = l.school_name
+        <where>
+            <if test="batchList != null and batchList.size() > 0">
+                and
+                <foreach collection="batchList" item="batch" open="(" separator=" or " close=")">
+                    m.batch like concat('%','${batch}','%')
+                </foreach>
+            </if>
+            and m.subject = #{subject}
+            <if test="schoolNameList != null and schoolNameList.size() > 0">
+                and
+                <foreach collection="schoolNameList" item="school_name" open="(" separator=" or " close=")">
+                    m.school_name like concat('%','${school_name}','%')
+                </foreach>
+            </if>
+            <if test="majorList != null and majorList.size() > 0">
+                and
+                <foreach collection="majorList" item="major_name" open="(" separator=" or " close=")">
+                    m.major_name like concat('%','${major_name}','%')
+                </foreach>
+            </if>
+            <if test="(provinceList != null and provinceList.size() > 0) or (cityList != null and cityList.size() > 0)">
+                and (
+                <if test="provinceList != null and provinceList.size() > 0">
+                    <foreach collection="provinceList" item="province" open="(" separator=" or " close=")">
+                        l.province like concat('%','${province}','%')
+                    </foreach>
+                </if>
+                <if test="cityList != null and cityList.size() > 0">
+                    or
+                    <foreach collection="cityList" item="city" open="(" separator=" or " close=")">
+                        l.city like concat('%','${city}','%')
+                    </foreach>
+                </if>
+                )
+            </if>
+            <if test="minScore != null">
+                and m.one_one_score &gt;= #{minScore}
+            </if>
+            <if test="maxScore != null">
+                and m.one_one_score &lt;= #{maxScore}
+            </if>
+            <if test="year != null and year.length() > 0">
+                and m.year = #{year}
+            </if>
+            <if test="fee != null and fee.length() > 0">
+                and m.tuition_fee &lt;= #{fee}
+            </if>
+        </where>
+        order by FIELD(m.batch,'本科提前A','专科提前','本科一批','本科二批','高职高专'),school_name, one_one_score desc;
+    </select>
+    <select id="selectByConditionOnlyProvinceOrCity" resultMap="innerMap">
+        select
+        <include refid="innerList" />
+        from major m left join school_location l
+        on m.school_name = l.school_name
+        <where>
+            <if test="batchList != null and batchList.size() > 0">
+                and
+                <foreach collection="batchList" item="batch" open="(" separator=" or " close=")">
+                    m.batch like concat('%','${batch}','%')
+                </foreach>
+            </if>
+            and m.subject = #{subject}
+            <if test="schoolNameList != null and schoolNameList.size() > 0">
+                and
+                <foreach collection="schoolNameList" item="school_name" open="(" separator=" or " close=")">
+                    m.school_name like concat('%','${school_name}','%')
+                </foreach>
+            </if>
+            <if test="majorList != null and majorList.size() > 0">
+                and
+                <foreach collection="majorList" item="major_name" open="(" separator=" or " close=")">
+                    m.major_name like concat('%','${major_name}','%')
+                </foreach>
+            </if>
+
+            <if test="provinceList != null and provinceList.size() > 0">
+                and
+                <foreach collection="provinceList" item="province" open="(" separator=" or " close=")">
+                    l.province like concat('%','${province}','%')
+                </foreach>
+            </if>
+            <if test="cityList != null and cityList.size() > 0">
+                and
+                <foreach collection="cityList" item="city" open="(" separator=" or " close=")">
+                    l.city like concat('%','${city}','%')
+                </foreach>
+            </if>
+
+            <if test="minScore != null">
+                and m.one_one_score &gt;= #{minScore}
+            </if>
+            <if test="maxScore != null">
+                and m.one_one_score &lt;= #{maxScore}
+            </if>
+            <if test="year != null and year.length() > 0">
+                and m.year = #{year}
+            </if>
+            <if test="fee != null and fee.length() > 0">
+                and m.tuition_fee &lt;= #{fee}
+            </if>
+        </where>
+        order by one_one_score desc,FIELD(m.batch,'本科提前A','专科提前','本科一批','本科二批','高职高专');
+    </select>
+    <select id="selectByConditionGroupBySchoolOnlyProvinceOrCity" resultMap="innerMap">
+        select
+        <include refid="innerList" />
+        from major m left join school_location l
+        on m.school_name = l.school_name
+        <where>
+            <if test="batchList != null and batchList.size() > 0">
+                and
+                <foreach collection="batchList" item="batch" open="(" separator=" or " close=")">
+                    m.batch like concat('%','${batch}','%')
+                </foreach>
+            </if>
+            and m.subject = #{subject}
+            <if test="schoolNameList != null and schoolNameList.size() > 0">
+                and
+                <foreach collection="schoolNameList" item="school_name" open="(" separator=" or " close=")">
+                    m.school_name like concat('%','${school_name}','%')
+                </foreach>
+            </if>
+            <if test="majorList != null and majorList.size() > 0">
+                and
+                <foreach collection="majorList" item="major_name" open="(" separator=" or " close=")">
+                    m.major_name like concat('%','${major_name}','%')
+                </foreach>
+            </if>
+
+                <if test="provinceList != null and provinceList.size() > 0">
+                    and
+                    <foreach collection="provinceList" item="province" open="(" separator=" or " close=")">
+                        l.province like concat('%','${province}','%')
+                    </foreach>
+                </if>
+                <if test="cityList != null and cityList.size() > 0">
+                    and
+                    <foreach collection="cityList" item="city" open="(" separator=" or " close=")">
+                        l.city like concat('%','${city}','%')
+                    </foreach>
+                </if>
+
+            <if test="minScore != null">
+                and m.one_one_score &gt;= #{minScore}
+            </if>
+            <if test="maxScore != null">
+                and m.one_one_score &lt;= #{maxScore}
+            </if>
+            <if test="year != null and year.length() > 0">
+                and m.year = #{year}
+            </if>
+            <if test="fee != null and fee.length() > 0">
+                and m.tuition_fee &lt;= #{fee}
+            </if>
+        </where>
+        order by FIELD(m.batch,'本科提前A','专科提前','本科一批','本科二批','高职高专'),school_name, one_one_score desc;
+    </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from major
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from major
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zyf.springboot06datamybatis.bean.Major">
+    insert into major (id, subject, batch, 
+      school_ID, school_name, major_id, 
+      major_name, amount, one_one_score, 
+      already_amount, tuition_fee, location, 
+      remark, year)
+    values (#{id,jdbcType=INTEGER}, #{subject,jdbcType=VARCHAR}, #{batch,jdbcType=VARCHAR}, 
+      #{schoolId,jdbcType=VARCHAR}, #{schoolName,jdbcType=VARCHAR}, #{majorId,jdbcType=VARCHAR}, 
+      #{majorName,jdbcType=VARCHAR}, #{amount,jdbcType=INTEGER}, #{oneOneScore,jdbcType=INTEGER}, 
+      #{alreadyAmount,jdbcType=INTEGER}, #{tuitionFee,jdbcType=VARCHAR}, #{location,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{year,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zyf.springboot06datamybatis.bean.Major">
+    insert into major
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="subject != null">
+        subject,
+      </if>
+      <if test="batch != null">
+        batch,
+      </if>
+      <if test="schoolId != null">
+        school_ID,
+      </if>
+      <if test="schoolName != null">
+        school_name,
+      </if>
+      <if test="majorId != null">
+        major_id,
+      </if>
+      <if test="majorName != null">
+        major_name,
+      </if>
+      <if test="amount != null">
+        amount,
+      </if>
+      <if test="oneOneScore != null">
+        one_one_score,
+      </if>
+      <if test="alreadyAmount != null">
+        already_amount,
+      </if>
+      <if test="tuitionFee != null">
+        tuition_fee,
+      </if>
+      <if test="location != null">
+        location,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="year != null">
+        year,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="subject != null">
+        #{subject,jdbcType=VARCHAR},
+      </if>
+      <if test="batch != null">
+        #{batch,jdbcType=VARCHAR},
+      </if>
+      <if test="schoolId != null">
+        #{schoolId,jdbcType=VARCHAR},
+      </if>
+      <if test="schoolName != null">
+        #{schoolName,jdbcType=VARCHAR},
+      </if>
+      <if test="majorId != null">
+        #{majorId,jdbcType=VARCHAR},
+      </if>
+      <if test="majorName != null">
+        #{majorName,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null">
+        #{amount,jdbcType=INTEGER},
+      </if>
+      <if test="oneOneScore != null">
+        #{oneOneScore,jdbcType=INTEGER},
+      </if>
+      <if test="alreadyAmount != null">
+        #{alreadyAmount,jdbcType=INTEGER},
+      </if>
+      <if test="tuitionFee != null">
+        #{tuitionFee,jdbcType=VARCHAR},
+      </if>
+      <if test="location != null">
+        #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="year != null">
+        #{year,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zyf.springboot06datamybatis.bean.Major">
+    update major
+    <set>
+      <if test="subject != null">
+        subject = #{subject,jdbcType=VARCHAR},
+      </if>
+      <if test="batch != null">
+        batch = #{batch,jdbcType=VARCHAR},
+      </if>
+      <if test="schoolId != null">
+        school_ID = #{schoolId,jdbcType=VARCHAR},
+      </if>
+      <if test="schoolName != null">
+        school_name = #{schoolName,jdbcType=VARCHAR},
+      </if>
+      <if test="majorId != null">
+        major_id = #{majorId,jdbcType=VARCHAR},
+      </if>
+      <if test="majorName != null">
+        major_name = #{majorName,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null">
+        amount = #{amount,jdbcType=INTEGER},
+      </if>
+      <if test="oneOneScore != null">
+        one_one_score = #{oneOneScore,jdbcType=INTEGER},
+      </if>
+      <if test="alreadyAmount != null">
+        already_amount = #{alreadyAmount,jdbcType=INTEGER},
+      </if>
+      <if test="tuitionFee != null">
+        tuition_fee = #{tuitionFee,jdbcType=VARCHAR},
+      </if>
+      <if test="location != null">
+        location = #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="year != null">
+        year = #{year,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zyf.springboot06datamybatis.bean.Major">
+    update major
+    set subject = #{subject,jdbcType=VARCHAR},
+      batch = #{batch,jdbcType=VARCHAR},
+      school_ID = #{schoolId,jdbcType=VARCHAR},
+      school_name = #{schoolName,jdbcType=VARCHAR},
+      major_id = #{majorId,jdbcType=VARCHAR},
+      major_name = #{majorName,jdbcType=VARCHAR},
+      amount = #{amount,jdbcType=INTEGER},
+      one_one_score = #{oneOneScore,jdbcType=INTEGER},
+      already_amount = #{alreadyAmount,jdbcType=INTEGER},
+      tuition_fee = #{tuitionFee,jdbcType=VARCHAR},
+      location = #{location,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      year = #{year,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
