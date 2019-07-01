@@ -33,7 +33,7 @@ $(function () {
 
         var minorityArr = document.getElementsByName("minority");
         var minority = "false";
-        for(var i=0; i < minorityArr.length; i ++){
+        for(var i=0; i < minorityArr.length; i++){
             if(minorityArr[i].checked){
                 minority = minorityArr[i].value;
             }

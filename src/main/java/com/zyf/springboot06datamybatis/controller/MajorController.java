@@ -129,10 +129,13 @@ public class MajorController {
         String year = "2018";
         String fee = null;
 
-        if (minority.equals("true")) {
-            majorList.clear();
-            majorList.add("少数民族");
+        if (minority != null) {
+            if ("true".equals(minority)) {
+                majorList.clear();
+                majorList.add("少数民族");
+            }
         }
+
 
         return majorService.queryMajorByCondition(batchList, subject, schoolNameList, majorList, provinceList, cityList, minScore, maxScore, year, fee, groupBoolean);
     }

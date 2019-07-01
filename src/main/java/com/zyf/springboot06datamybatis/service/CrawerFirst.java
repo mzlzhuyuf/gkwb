@@ -1,9 +1,11 @@
 package com.zyf.springboot06datamybatis.service;
 
 import com.zyf.springboot06datamybatis.bean.Major;
+import com.zyf.springboot06datamybatis.bean.RankScore;
 import com.zyf.springboot06datamybatis.bean.School;
 import com.zyf.springboot06datamybatis.bean.SchoolLocation;
 import com.zyf.springboot06datamybatis.dao.MajorDao;
+import com.zyf.springboot06datamybatis.dao.RankScoreDao;
 import com.zyf.springboot06datamybatis.dao.SchoolDao;
 import com.zyf.springboot06datamybatis.dao.SchoolLocationDao;
 import org.apache.http.HttpEntity;
@@ -19,6 +21,12 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 /**
  * @author Hero
  * @description PACKAGE_NAME
@@ -31,6 +39,9 @@ public class CrawerFirst {
 
     @Autowired
     MajorDao majorDao;
+
+    @Autowired
+    RankScoreDao rankScoreDao;
 
     @Autowired
     SchoolLocationDao schoolLocationDao;
@@ -82,31 +93,6 @@ public class CrawerFirst {
                 schoolDao.addSchool(school);
                 paChongMajor(school);
             }
-
-
-            /*BufferedWriter bufferedWriter = null;
-            try {
-                File file = new File("D:/gkwb/test.html");
-                bufferedWriter = new BufferedWriter(new FileWriter(file));
-                bufferedWriter.write(content);
-                *//*Document doc = Jsoup.parse(content);
-                Element table = doc.getElementById("report1");
-                Elements trs = table.select("tr");
-                for (int i = 0; i < trs.size(); ++i) {
-                    // 获取一个tr
-                    Element tr = trs.get(i);
-                    // 获取该行的所有td节点
-                    Elements tds = tr.select("td");
-                    // 选择某一个td节点
-                    Element hrefs = tds.select("a").first();
-                    if (hrefs != null) {
-                        System.out.println(hrefs.attr("href"));
-                    }
-                }*//*
-            } finally {
-                bufferedWriter.close();
-            }*/
-            //System.out.println(content);
         }
     }
 
@@ -231,5 +217,59 @@ public class CrawerFirst {
             }
 
         }
+    }
+
+    public void paChongRank (String url, String subject, String year) throws Exception {
+        //创建httpClient对象
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+
+        //创建httpGet对象 获取访问地址
+        HttpGet httpGet = new HttpGet(url);
+
+        //使用httpClient对象发起请求 获取响应
+        CloseableHttpResponse response = httpClient.execute(httpGet);
+
+        //解析响应，获取数据
+        //判断状态码是否是200
+        if (response.getStatusLine().getStatusCode() == 200) {
+            HttpEntity httpEntity = response.getEntity();
+            //拿到静态页面
+            String content = EntityUtils.toString(httpEntity, "gbk");
+            Document doc = Jsoup.parse(content);
+            Element table = doc.selectFirst("table");
+            Elements trs = table.select("tr");
+            int total = Integer.valueOf(trs.get(trs.size() - 1).select("td").get(1).text());
+            for (int i = 1; i < trs.size(); i++) {
+                int last = 0;
+                if (i != 1) {
+                    last = Integer.valueOf(trs.get(i - 1).select("td").get(1).text());
+                }
+                RankScore rankScore = new RankScore(subject, year);
+                Elements tds = trs.get(i).select("td");
+                rankScore.setScore(Integer.valueOf(tds.get(0).text().substring(0, 3)));
+                rankScore.setRank(Integer.valueOf(tds.get(1).text()));
+                rankScore.setSamePeople(rankScore.getRank() - last);
+                rankScore.setTotalPeople(total);
+                //System.out.println(rankScore);
+                rankScoreDao.insert(rankScore);
+
+            }
+        }
+    }
+
+    public void paChongResult () throws Exception {
+        HttpURLConnection conn = (HttpURLConnection) new URL("https://www1.nm.zsks.cn/xxcx/gkcx/lqmaxmin_18.jsp").openConnection();
+        conn.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible;MSIE 7.0; Windows NT 5.1; Maxthon;)");
+        conn.setRequestProperty("Accept-Encoding", "gzip");
+        conn.setRequestProperty("referer","https://www.nm.zsks.cn");
+        conn.setRequestProperty("cookie","https://www.nm.zsks.cn");
+        InputStream inputStream = conn.getInputStream();
+
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "gbk"));
+        String line = "";
+        while ((line = bufferedReader.readLine()) != null) {
+            System.out.println(line);
+        }
+        //System.out.println(inputStream.toString());
     }
 }

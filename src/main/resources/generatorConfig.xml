@@ -61,7 +61,7 @@
         </javaClientGenerator>
 
 
-        <table tableName="school_location" domainObjectName="SchoolLocation"
+        <table tableName="rank_score" domainObjectName="RankScore"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"><!--在这里，设置从数据库到实体类的对应关系名。且还可以设置是否生成增删查改方法-->
