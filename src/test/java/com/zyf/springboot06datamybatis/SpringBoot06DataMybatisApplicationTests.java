@@ -1,5 +1,6 @@
 package com.zyf.springboot06datamybatis;
 
+import com.zyf.springboot06datamybatis.service.BeanContext;
 import com.zyf.springboot06datamybatis.service.CrawerFirst;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +25,91 @@ public class SpringBoot06DataMybatisApplicationTests  {
 
     @Test
     public void contextLoads() throws Exception {
+        /*long start = System.currentTimeMillis();
+        System.out.println(start);
+        //crawerFirst.paChong("https://www.nm.zsks.cn/zy_11_61_2018/D_10.html", "蒙授理科");
+        //普通文科
+        new Thread(){
+            @Override
+            public void run() {
+                CrawerFirst crawerFirst= BeanContext.getApplicationContext().getBean(CrawerFirst.class);
+                try {
+                    crawerFirst.paChong("https://www.nm.zsks.cn/zy_11_61_2018/A_10.html", "普通文科");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+        *//*new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    crawerFirst.paChong("https://www.nm.zsks.cn/zy_11_61_2018/A_10.html", "普通文科");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }){}.start();*//*
+        //普通理科
+        new Thread(){
+            @Override
+            public void run() {
+                CrawerFirst crawerFirst= BeanContext.getApplicationContext().getBean(CrawerFirst.class);
+                try {
+                    crawerFirst.paChong("https://www.nm.zsks.cn/zy_11_61_2018/B_10.html", "普通理科");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+        *//*new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    crawerFirst.paChong("https://www.nm.zsks.cn/zy_11_61_2018/B_10.html", "普通理科");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }){}.start();*//*
+        //蒙授文科
+        new Thread(){
+            @Override
+            public void run() {
+                CrawerFirst crawerFirst= BeanContext.getApplicationContext().getBean(CrawerFirst.class);
+                try {
+                    crawerFirst.paChong("https://www.nm.zsks.cn/zy_11_61_2018/C_10.html", "蒙授文科");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+        *//*new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    crawerFirst.paChong("https://www.nm.zsks.cn/zy_11_61_2018/C_10.html", "蒙授文科");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }){}.start();*//*
+        //蒙授理科
+
+        new Thread(){
+            @Override
+            public void run() {
+                CrawerFirst crawerFirst= BeanContext.getApplicationContext().getBean(CrawerFirst.class);
+                try {
+                    crawerFirst.paChong("https://www.nm.zsks.cn/zy_11_61_2018/D_10.html", "蒙授理科");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+
+        long end = System.currentTimeMillis();
+        System.out.println(end - start);*/
 /*        crawerFirst.paChong("https://www.nm.zsks.cn/zy_31_2018/B_11.html", "普通理科");
         crawerFirst.paChong("https://www.nm.zsks.cn/zy_31_2018/A_11.html", "普通文科");
         crawerFirst.paChong("https://www.nm.zsks.cn/zy_71_2018/B_11.html", "普通理科");*/
@@ -54,7 +140,9 @@ public class SpringBoot06DataMybatisApplicationTests  {
         crawerFirst.paChongRank("https://www.nm.zsks.cn/fzlm/17tjxx/201706/201706-C.html" ,"蒙授文科", "2017");
         crawerFirst.paChongRank("https://www.nm.zsks.cn/fzlm/17tjxx/201706/201706-D.html" ,"蒙授理科", "2017");*/
 
-        crawerFirst.paChongResult();
+        //crawerFirst.paChongResult();
+
+        crawerFirst.paChongGongAn("https://www.nm.zsks.cn/19gkwb/201907/t20190705_38482.html", "2019");
     }
 
 }

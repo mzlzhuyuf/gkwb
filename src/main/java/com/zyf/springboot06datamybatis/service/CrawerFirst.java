@@ -1,13 +1,7 @@
 package com.zyf.springboot06datamybatis.service;
 
-import com.zyf.springboot06datamybatis.bean.Major;
-import com.zyf.springboot06datamybatis.bean.RankScore;
-import com.zyf.springboot06datamybatis.bean.School;
-import com.zyf.springboot06datamybatis.bean.SchoolLocation;
-import com.zyf.springboot06datamybatis.dao.MajorDao;
-import com.zyf.springboot06datamybatis.dao.RankScoreDao;
-import com.zyf.springboot06datamybatis.dao.SchoolDao;
-import com.zyf.springboot06datamybatis.dao.SchoolLocationDao;
+import com.zyf.springboot06datamybatis.bean.*;
+import com.zyf.springboot06datamybatis.dao.*;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -45,6 +39,10 @@ public class CrawerFirst {
 
     @Autowired
     SchoolLocationDao schoolLocationDao;
+
+    @Autowired
+    PoliceQualifiedDao policeQualifiedDao;
+
     public void paChong(String url, String subject) throws Exception {
 
         //创建httpClient对象
@@ -253,6 +251,43 @@ public class CrawerFirst {
                 //System.out.println(rankScore);
                 rankScoreDao.insert(rankScore);
 
+            }
+        }
+    }
+
+    public void paChongGongAn(String url, String year) throws Exception {
+        //创建httpClient对象
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+
+        //创建httpGet对象 获取访问地址
+        HttpGet httpGet = new HttpGet(url);
+
+        //使用httpClient对象发起请求 获取响应
+        CloseableHttpResponse response = httpClient.execute(httpGet);
+
+        //解析响应，获取数据
+        //判断状态码是否是200
+        if (response.getStatusLine().getStatusCode() == 200) {
+            HttpEntity httpEntity = response.getEntity();
+            //拿到静态页面
+            String content = EntityUtils.toString(httpEntity, "utf-8");
+            Document doc = Jsoup.parse(content);
+            Elements divs = doc.select("div");
+            Element div = divs.get(3).selectFirst("table");
+            Elements trs = div.select("tr");
+            for (int i = 1; i < trs.size(); i++) {
+                PoliceQualified policeQualified = new PoliceQualified();
+                Elements tds = trs.get(i).select("td");
+                policeQualified.setCandidateNumber(tds.get(1).text());
+                policeQualified.setCandidateName(tds.get(2).text());
+                policeQualified.setCandidateSex(tds.get(3).text());
+                policeQualified.setCandidateBanch(tds.get(4).text());
+                policeQualified.setCandidateSubject(tds.get(5).text());
+                policeQualified.setCandidateScore(Integer.valueOf(tds.get(6).text()));
+                policeQualified.setMark(tds.get(7).text());
+                policeQualified.setYear(year);
+                System.out.println(policeQualified.toString());
+                policeQualifiedDao.insert(policeQualified);
             }
         }
     }
